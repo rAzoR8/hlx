@@ -367,7 +367,7 @@ namespace hlx
 	}
 
 #else // unix
-#define HR(x) { HRESULT res = (x); if(FAILED(res)){HFATAL("API-Call %s failed with code %X", res, SW(#x));}}
+#define HR(x) { HRESULT res = (x); if(FAILED(res)){HFATAL("API-Call %s failed with code %X", SW(#x), res);}}
 #endif //!WIN32
 
 #endif // !HR
@@ -389,7 +389,7 @@ namespace hlx
 		}\
 	}
 #else // unix
-#define HRWARNING(x) { HRESULT res = (x); if(FAILED(res)){HWARNING("API-Call %s failed with code %X", res, SW(#x));}}
+#define HRWARNING(x) { HRESULT res = (x); if(FAILED(res)){HWARNING("API-Call %s failed with code %X", SW(#x), res);}}
 #endif
 
 #endif // !HRWARNING
@@ -410,7 +410,7 @@ namespace hlx
 		}\
 	}
 #else // unix
-#define HRERROR(x) { HRESULT res = (x); if(FAILED(res)){HERROR("API-Call %s failed with code %X", res, SW(#x));}}
+#define HRERROR(x) { HRESULT res = (x); if(FAILED(res)){HERROR("API-Call %s failed with code %X", SW(#x), res);}}
 #endif //!WIN32
 
 #endif // !HRERROR

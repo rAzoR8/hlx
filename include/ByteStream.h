@@ -42,7 +42,7 @@ namespace hlx
 		basestream(BYTES& b) : m_Bytes(b) {};
 
 		// create new instance from moved bytes
-		basestream(BYTES&& b) : m_pBytes(new BYTES(std::forward<BYTES>(b))), m_Bytes(*m_pBytes) {};
+		basestream(BYTES&& b) : m_pBytes(new BYTES(std::move(b))), m_Bytes(*m_pBytes) {};
 
 		// creates a new instance of bytes
 		basestream() : m_pBytes(new BYTES) , m_Bytes(*m_pBytes) {};
