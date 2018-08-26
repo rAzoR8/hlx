@@ -36,6 +36,28 @@
 
 namespace hlx
 {
+#pragma region find_first_of
+    template <typename char_t = base_char_t>
+    inline size_t find_first_of(const std::basic_string<char_t>& _sInput, const std::vector<std::basic_string<char_t>>& _sFind, _Out_ size_t& _uIndex, const size_t& _uPos = 0u)
+    {
+        size_t uFirst = std::string::npos;
+        size_t uCur = std::string::npos;
+
+        const size_t uSize = _sFind.size();
+        for (size_t i = 0u; i < uSize; ++i)
+        {
+            uCur = _sInput.find(_sFind.at(i), _uPos);
+            if (uCur < uFirst)
+            {
+                uFirst = uCur;
+                _uIndex = i;
+            }
+        }
+
+        return uFirst;
+    }
+#pragma endregion
+
 
 #pragma region to_lower
 	template <typename char_t = base_char_t>
@@ -187,10 +209,11 @@ namespace hlx
 	
 #pragma region split
 	template <typename char_t = base_char_t>
-	inline std::vector<std::basic_string<char_t>> split(const std::basic_string<char_t>& str, char_t separator)
+	inline std::vector<std::basic_string<char_t>> split(const std::basic_string<char_t>& str, char_t separator, const size_t offset = 0u)
 	{
 		std::vector<std::basic_string<char_t>> tokens;
 		std::basic_stringstream<char_t> stream(str);
+        stream.seekg(offset);
 
 		std::basic_string<char_t> token;
 		while (std::getline(stream, token, separator))
@@ -202,24 +225,26 @@ namespace hlx
 	}
 
 	template <typename char_t = base_char_t>
-	inline std::vector<std::basic_string<char_t>> split(const char_t* str, char_t separator)
+	inline std::vector<std::basic_string<char_t>> split(const char_t* str, char_t separator, const size_t offset = 0u)
 	{
-		return split(std::basic_string<char_t>(str));
+		return split(std::basic_string<char_t>(str), offset);
 	}
 
 	template <typename char_t = base_char_t>
-	inline std::vector<std::basic_string<char_t>> split(const std::basic_string<char_t>& str, const std::basic_string<char_t>& separator)
+	inline std::vector<std::basic_string<char_t>> split(const std::basic_string<char_t>& str, const std::basic_string<char_t>& separator, const size_t offset = 0u, const size_t end = std::string::npos)
 	{
 		std::vector<std::basic_string<char_t>> tokens;
 
-		size_t uPos = 0u;
-		size_t uNext = str.find(separator);
+		size_t uPos = offset;
+		size_t uNext = str.find(separator, offset);
 
-		while (uNext > uPos)
+		while (uNext >= uPos)
 		{
-			tokens.push_back(str.substr(uPos, uNext - uPos));
-			if (uNext == std::string::npos)
-				break;
+            if (uNext > uPos && uNext <= end)
+			    tokens.push_back(str.substr(uPos, uNext - uPos));
+
+            if (uNext >= end)
+                break;
 
 			uPos = uNext + separator.size();
 			uNext = str.find(separator, uPos);
@@ -228,34 +253,37 @@ namespace hlx
 		return tokens;
 	}
 
+    template <typename char_t = base_char_t>
+    inline std::vector<std::basic_string<char_t>> split(const std::basic_string<char_t>& str, const std::vector<std::basic_string<char_t>>& separators, const size_t offset = 0u, const size_t end = std::string::npos)
+    {
+        std::vector<std::basic_string<char_t>> tokens;
+
+        size_t uSeparatorIndex = 0;
+        size_t uPos = offset;
+        size_t uNext = find_first_of(str, separators, uSeparatorIndex, uPos);
+
+        while (uNext >= uPos)
+        {
+            if(uNext > uPos && uNext <= end)
+                tokens.push_back(str.substr(uPos, uNext - uPos));
+
+            if (uNext >= end)
+                break;
+
+            uPos = uNext + separators[uSeparatorIndex].size();
+            uNext = find_first_of(str, separators, uSeparatorIndex, uPos);
+        }
+
+        return tokens;
+    }
+
 	template <typename char_t = base_char_t>
-	inline std::vector<std::basic_string<char_t>> split(const std::basic_string<char_t>& str, const char_t* separator)
+	inline std::vector<std::basic_string<char_t>> split(const std::basic_string<char_t>& str, const char_t* separator, const size_t offset = 0u, const size_t end = std::string::npos)
 	{
-		return split(str, std::basic_string<char_t>(separator));
+		return split(str, std::basic_string<char_t>(separator), offset, end);
 	}
 #pragma endregion
 
-#pragma region find_first_of
-	template <typename char_t = base_char_t>
-	inline size_t find_first_of(const std::basic_string<char_t>& _sInput, const std::vector<std::basic_string<char_t>>& _sFind, _Out_ size_t& _uIndex, const size_t& _uPos = 0u)
-	{
-		size_t uFirst = std::string::npos;
-		size_t uCur = std::string::npos;
-
-		const size_t uSize = _sFind.size();
-		for (size_t i = 0u; i < uSize; ++i)
-		{			
-			uCur = _sInput.find(_sFind.at(i), _uPos);
-			if (uCur < uFirst)
-			{
-				uFirst = uCur;
-				_uIndex = i;
-			}
-		}
-
-		return uFirst;
-	}
-#pragma endregion
 
 #pragma region get_body
 	// set _uStart = 0 to search from the beginning of the string
