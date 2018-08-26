@@ -28,7 +28,7 @@
 #ifndef HLX_ITERATORRANGE_H
 #define HLX_ITERATORRANGE_H
 
-#include <iterator>
+#include <iterator> // for std::distance
 
 // http://en.cppreference.com/w/cpp/concept/Container
 
@@ -37,10 +37,25 @@ namespace hlx
 	template <typename Iterator>
 	struct IteratorRange
 	{
-		IteratorRange(Iterator _start, Iterator _end) :
+		IteratorRange(const Iterator& _start, const Iterator& _end) :
 			m_start(_start), m_end(_end) {}
 
 		IteratorRange(const IteratorRange& _other) : m_start(_other.m_start), m_end(_other.m_end) {}
+        IteratorRange(IteratorRange&& _other) : m_start(std::move(_other.m_start)), m_end(std::move(_other.m_end)) {}
+
+        IteratorRange& operator=(const IteratorRange& _other)
+        {
+            m_start = _other.m_start;
+            m_end = _other.m_end;
+            return *this;
+        }
+
+        IteratorRange& operator=(IteratorRange&& _other)
+        {
+            m_start = std::move(_other.m_start);
+            m_end = std::move(_other.m_end);
+            return *this;
+        }
 
 		inline auto begin() const { return m_start; }
 		inline auto end() const { return m_end; }
@@ -57,9 +72,9 @@ namespace hlx
 	};
 
 	template <typename Iterator>
-	inline IteratorRange<Iterator> make_range(Iterator _start, Iterator _end)
+	inline IteratorRange<Iterator> make_range(Iterator&& _start, Iterator&& _end)
 	{
-		return IteratorRange<Iterator>(_start, _end);
+		return IteratorRange<Iterator>(std::forward<Iterator>(_start), std::forward<Iterator>(_end));
 	}
 
 	// usage: for(auto& i : make_range(start, end){i++;}

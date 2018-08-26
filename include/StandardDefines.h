@@ -143,7 +143,7 @@ inline void HBreakOnAlloc(long iAllocId) noexcept
 
 #include <algorithm>
 
-template <class Container, class Pred, class Iterator = Container::iterator>
+template <class Container, class Pred, class Iterator = typename Container::iterator>
 inline void RemoveIf(Container& _Container, const Pred& _Pred)
 {
 	Iterator it = std::remove_if(_Container.begin(), _Container.end(), _Pred);
@@ -153,7 +153,7 @@ inline void RemoveIf(Container& _Container, const Pred& _Pred)
 	}
 }
 
-template <class Container, class Value = Container::value_type>
+template <class Container, class Value = typename Container::value_type>
 inline void RemoveIfValue(Container& _Container, const Value& _ValueToErase)
 {
 	RemoveIf(_Container, [&_ValueToErase](const Value& _Other) {return _ValueToErase == _Other; });

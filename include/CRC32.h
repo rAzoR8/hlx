@@ -33,7 +33,7 @@
 
 namespace hlx
 {
-	//CRC32, length is optional and should be smaller than the data size if set
+	//CRC32
 	inline uint32_t CRC32(const void* _pData, const size_t& _uLength)
 	{
 		size_t uCurSize = _uLength;
