@@ -60,6 +60,12 @@ namespace hlx
 
 
 #pragma region to_lower
+    template <typename char_t = base_char_t>
+    inline char_t to_lower(const char_t c)
+    {
+        return ::tolower(c);
+    }
+
 	template <typename char_t = base_char_t>
 	inline std::basic_string<char_t> to_lower(const std::basic_string<char_t>& str)
 	{
@@ -82,6 +88,12 @@ namespace hlx
 #pragma endregion
 
 #pragma region to_upper
+    template <typename char_t = base_char_t>
+    inline char_t to_upper(const char_t c)
+    {
+        return ::toupper(c);
+    }
+
 	template <typename char_t = base_char_t>
 	inline std::basic_string<char_t> to_upper(const std::basic_string<char_t>& str)
 	{
@@ -299,29 +311,37 @@ namespace hlx
 			return false;
 		}
 
-		const std::vector<std::basic_string<char_t>> Tags = { _sOpen, _sClose };
+        size_t uMaxClose = uMinOpen;
 
-		size_t uMaxClose = uMinOpen;
-		size_t uCount = 1u;
+        if (_sOpen == _sClose)
+        {
+            uMaxClose = _sInput.find(_sClose, uMinOpen + _sClose.size());
+        }
+        else
+        {
+            const std::vector<std::basic_string<char_t>> Tags = { _sOpen, _sClose };
 
-		for (size_t uCurPos = uMinOpen, uIndex = 0u;
-			uCount > 0u && uCurPos != std::string::npos;)
-		{
-			uCurPos = find_first_of<char_t>(_sInput, Tags, uIndex, uCurPos + 1);
+            size_t uCount = 1u;
 
-			if (uCurPos == std::string::npos)
-				break;
+            for (size_t uCurPos = uMinOpen, uIndex = 0u;
+                uCount > 0u && uCurPos != std::string::npos;)
+            {
+                uCurPos = find_first_of<char_t>(_sInput, Tags, uIndex, uCurPos + 1);
 
-			if (uIndex == 0u) // open tag
-			{
-				++uCount;
-			}
-			else if (uIndex == 1u) // close tag
-			{
-				uMaxClose = uCurPos;
-				--uCount;
-			}
-		}
+                if (uCurPos == std::string::npos)
+                    break;
+
+                if (uIndex == 0u) // open tag
+                {
+                    ++uCount;
+                }
+                else if (uIndex == 1u) // close tag
+                {
+                    uMaxClose = uCurPos;
+                    --uCount;
+                }
+            }
+        }
 
 		_uStart = uMinOpen;
 		_uEnd = uMaxClose;
@@ -393,16 +413,29 @@ namespace hlx
 #pragma endregion
 
 #pragma region contains
+    template <typename char_t = base_char_t>
+    inline bool contains(const std::basic_string<char_t>& str, const char_t find, bool _bCaseSensitive = true)
+    {
+        if (_bCaseSensitive)
+        {
+            return str.find(find, 0u) != string::npos;
+        }
+        else
+        {
+            return to_lower(str).find(to_lower(find), 0u) != string::npos;
+        }
+    }
+
 	template <typename char_t = base_char_t>
 	inline bool contains(const std::basic_string<char_t>& str, const std::basic_string<char_t>& find, bool _bCaseSensitive = true)
 	{
 		if (_bCaseSensitive)
 		{
-			return str.find(find, 0) != string::npos;
+			return str.find(find, 0u) != string::npos;
 		}
 		else
 		{
-			return to_lower(str).find(to_lower(find), 0) != string::npos;
+			return to_lower(str).find(to_lower(find), 0u) != string::npos;
 		}
 	}
 
@@ -414,6 +447,19 @@ namespace hlx
 #pragma endregion
 	
 #pragma region starts_with
+    template <typename char_t = base_char_t>
+    inline bool starts_with(const std::basic_string<char_t>& str, const char_t& find, bool _bCaseSensitive = true)
+    {
+        if (_bCaseSensitive)
+        {
+            return str.find(find, 0u) == 0u;
+        }
+        else
+        {
+            return to_lower(str).find(to_lower(find), 0u) == 0u;
+        }
+    }
+
 	template <typename char_t = base_char_t>
 	inline bool starts_with(const std::basic_string<char_t>& str, const std::basic_string<char_t>& find, bool _bCaseSensitive = true)
 	{
@@ -435,6 +481,19 @@ namespace hlx
 #pragma endregion
 	
 #pragma region ends_with
+    template <typename char_t = base_char_t>
+    inline bool ends_with(const std::basic_string<char_t>& str, const char_t& find, bool _bCaseSensitive = true)
+    {
+        if (_bCaseSensitive)
+        {
+            return str.rfind(find) == str.size() - find.size();
+        }
+        else
+        {
+            return to_lower(str).rfind(to_lower(find)) == str.size() - find.size();
+        }
+    }
+
 	template <typename char_t = base_char_t>
 	inline bool ends_with(const std::basic_string<char_t>& str, const std::basic_string<char_t>& find, bool _bCaseSensitive = true)
 	{
@@ -564,37 +623,37 @@ namespace hlx
 
 #pragma region replace
 	template <typename char_t = base_char_t>
-	inline void replace(std::basic_string<char_t>& str, const std::basic_string<char_t>& find, const std::basic_string<char_t>& replace)
+    inline void replace(std::basic_string<char_t>& str, const std::basic_string<char_t>& find, const std::basic_string<char_t>& replace, const size_t offset = 0u, const size_t end = std::string::npos)
 	{
-		size_t uPos = str.find(find);
+		size_t uPos = str.find(find, offset);
 
-		while (uPos != std::string::npos)
+		while (uPos < end)
 		{
 			str.replace(uPos, find.size(), replace);
 
-			uPos = str.find(find, uPos + 1);
+			uPos = str.find(find, uPos + 1u);
 		}
 	}
 
 	template <typename char_t = base_char_t>
-	inline void replace(std::basic_string<char_t>& str, const char_t* pFind, const char_t* pReplace)
+	inline void replace(std::basic_string<char_t>& str, const char_t* pFind, const char_t* pReplace, const size_t offset = 0u, const size_t end = std::string::npos)
 	{
-		replace(str, std::basic_string<char_t>(pFind), std::basic_string<char_t>(pReplace));
+		replace(str, std::basic_string<char_t>(pFind), std::basic_string<char_t>(pReplace), offset, end);
 	}
 
 	template <typename char_t = base_char_t>
-	inline std::basic_string<char_t> replace(const std::basic_string<char_t>& str, const std::basic_string<char_t>& sFind, const std::basic_string<char_t>& sReplace)
+	inline std::basic_string<char_t> replace(const std::basic_string<char_t>& str, const std::basic_string<char_t>& sFind, const std::basic_string<char_t>& sReplace, const size_t offset = 0u, const size_t end = std::string::npos)
 	{
 		std::basic_string<char_t> ret(str);
-		replace(ret, sFind, sReplace);
+		replace(ret, sFind, sReplace, offset, end);
 		return ret;
 	}
 
 	template <typename char_t = base_char_t>
-	inline std::basic_string<char_t> replace(const std::basic_string<char_t>& str, const char_t* pFind, const char_t* pReplace)
+	inline std::basic_string<char_t> replace(const std::basic_string<char_t>& str, const char_t* pFind, const char_t* pReplace, const size_t offset = 0u, const size_t end = std::string::npos)
 	{
 		std::basic_string<char_t> ret(str);
-		replace(ret, std::basic_string<char_t>(pFind), std::basic_string<char_t>(pReplace));
+		replace(ret, std::basic_string<char_t>(pFind), std::basic_string<char_t>(pReplace), offset, end);
 		return ret;
 	}
 #pragma endregion
