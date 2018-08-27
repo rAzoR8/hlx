@@ -119,17 +119,17 @@ namespace hlx
 	template <typename char_t = base_char_t>
 	inline std::basic_string<char_t> trim_right(const std::basic_string<char_t>& str)
 	{
-		int64_t uPos = str.size() - 1;
-		for (; uPos > 0 && std::isspace(str[uPos], std::locale::classic()); --uPos) {};
-		return str.substr(0, uPos+1);
+		int64_t iPos = str.size() - 1;
+		for (; iPos > 0 && std::isspace(str[size_t(iPos)], std::locale::classic()); --iPos) {};
+		return str.substr(0u, size_t(iPos+1));
 	}
 
 	template <typename char_t = base_char_t>
 	inline std::basic_string<char_t> trim_left(const std::basic_string<char_t>& str)
 	{
-		int64_t uPos = 0;
-		for (; uPos < str.size() && std::isspace(str[uPos], std::locale::classic()); ++uPos) {};
-		return str.substr(uPos);
+		int64_t iPos = 0;
+		for (; iPos < str.size() && std::isspace(str[size_t(iPos)], std::locale::classic()); ++iPos) {};
+		return str.substr(size_t(iPos));
 	}
 
 	template <typename char_t = base_char_t>
@@ -162,7 +162,7 @@ namespace hlx
 #pragma endregion
 	
 #pragma region read_until
-	template <typename char_t = base_char_t, typename stream_t = const byte>
+	template <typename char_t = base_char_t, typename stream_t = const bytes>
 	inline std::basic_string<char_t> read_until(basestream<stream_t>& stream, char_t separator)
 	{		
 		char_t c = {};
