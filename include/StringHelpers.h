@@ -127,9 +127,9 @@ namespace hlx
 	template <typename char_t = base_char_t>
 	inline std::basic_string<char_t> trim_left(const std::basic_string<char_t>& str)
 	{
-		int64_t iPos = 0;
-		for (; iPos < str.size() && std::isspace(str[size_t(iPos)], std::locale::classic()); ++iPos) {};
-		return str.substr(size_t(iPos));
+		size_t uPos = 0;
+		for (; uPos < str.size() && std::isspace(str[uPos], std::locale::classic()); ++uPos) {};
+		return str.substr(uPos);
 	}
 
 	template <typename char_t = base_char_t>
