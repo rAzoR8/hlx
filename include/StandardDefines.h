@@ -134,7 +134,6 @@ inline void HBreakOnAlloc(long iAllocId) noexcept
 #endif
 
 #include <Windows.h>
-#include <ppl.h>
 
 #endif //!_WIN32
 
@@ -157,6 +156,18 @@ template <class Container, class Value = typename Container::value_type>
 inline void RemoveIfValue(Container& _Container, const Value& _ValueToErase)
 {
 	RemoveIf(_Container, [&_ValueToErase](const Value& _Other) {return _ValueToErase == _Other; });
+}
+
+template <class Container, class Value = typename Container::value_type>
+inline decltype(auto) Find(const Container& _Container, const Value& _Value)
+{
+	return std::find(_Container.begin(), _Container.end(), _Value);
+}
+
+template <class Container, class Value = typename Container::value_type>
+inline bool Contains(const Container& _Container, const Value& _Value)
+{
+	return std::find(_Container.cbegin(), _Container.cend(), _Value) != _Container.cend();
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -280,16 +291,6 @@ inline constexpr size_t GetArrayLength(const T(&)[size]){return size;}
 #ifndef HFOREACH_CONST_TYPE_END
 #define HFOREACH_CONST_TYPE_END }}
 #endif
-
-// linux?
-//#ifndef HFOREACH_PARALLEL
-//#define HFOREACH_PARALLEL(_val, _begin, _end, _container_type)\
-//	Concurrency::parallel_for(_begin,_end, [&](const _container_type::value_type& _val) {
-//#endif
-//
-//#ifndef HFOREACH_PARALLEL_END
-//#define HFOREACH_PARALLEL_END });
-//#endif
 
 //---------------------------------------------------------------------------------------------------
 // safe delete & release
